@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+	<!-- INSERT에 NULL값이 들어가도록 세팅 -->
+	<settings>
+		<setting name="jdbcTypeForNull" value="NULL" />
+	</settings>
+
+	<!-- Aliase 설정 -->
+	<typeAliases>
+		<typeAlias alias="Member" type="org.jbp.psh.vo.Member"/>
+		<typeAlias alias="Club" type="org.jbp.psh.vo.Club"/>
+		<typeAlias alias="PageVO" type="org.jbp.psh.vo.PageVO"/>
+		<typeAlias alias="Player" type="org.jbp.psh.vo.Player"/>
+	</typeAliases>
+
+</configuration>
