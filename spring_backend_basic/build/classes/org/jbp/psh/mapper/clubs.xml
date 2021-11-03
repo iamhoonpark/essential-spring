@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC	
+"-//mybatis.org//DTD Mapper 3.0//EN"	
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="clubs">
+
+	<!-- clubs.selectList -->
+	<select id="selectList" resultType="Club">
+		SELECT club_id clubId, name, coach, founding_date foundingDate
+		FROM clubs
+	</select>
+	
+	<!-- selectPageList -->
+	<select id="selectPageList" resultType="Club" parameterType="PageVO">
+		SELECT clubId, name, coach, foundingDate
+		FROM(SELECT clubId, name, coach, foundingDate, rownum r
+			FROM(SELECT club_id clubId, name, coach, founding_date foundingDate
+				FROM clubs
+				ORDER BY 1))
+		WHERE r BETWEEN #{start} AND #{end}
+	</select>
+	
+	<!-- selectTotal -->
+	<select id="selectTotal" resultType="int">
+		SELECT COUNT(*)
+		FROM clubs
+	</select>
+	
+	<!-- selectOne -->
+	<select id="selectOne" resultType="Club" parameterType="int">
+		SELECT club_id clubId, name, coach, founding_date foundingDate
+		FROM clubs
+		WHERE club_id = #{clubId}
+	</select>
+	
+	<!-- selectPageNo -->
+	<select id="selectPageNo" parameterType="int" resultType="int">
+		SELECT CEIL(r/5)
+		FROM(SELECT clubId, rownum r
+		     FROM(SELECT club_id clubId
+		          FROM clubs
+		          ORDER BY 1))
+		WHERE clubId = #{clubId}
+	</select>
+	
+	<!-- insert -->
+	<insert id="insert" parameterType="Club">
+		<selectKey order="BEFORE" keyProperty="clubId" resultType="int">
+			SELECT clubs_seq.nextval
+			FROM dual
+		</selectKey>
+		INSERT INTO clubs(club_id, name, coach, founding_date)
+		VALUES(#{clubId}, #{name}, #{coach}, #{foundingDate})
+	</insert>
+	
+	<!-- update -->
+	<!-- 오류발생 : there is no getter for property named 'club_id' in class VO.Club
+	     해결방안 : 기존 파라미터 #{club_id}를 #{clubId}으로 수정했음 -->
+	<update id="update" parameterType="Club">
+		UPDATE clubs
+		SET name = #{name}, coach = #{coach}, founding_date = #{foundingDate} 
+		WHERE club_id = #{clubId}
+	</update>
+	
+	<!-- clubs.delete -->
+	<delete id="delete" parameterType="int">
+		DELETE clubs
+		WHERE club_id = #{clubId}
+	</delete>
+	
+</mapper>
+
+
+
+

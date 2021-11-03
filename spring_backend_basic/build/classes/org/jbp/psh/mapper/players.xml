@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC	
+"-//mybatis.org//DTD Mapper 3.0//EN"	
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="players">
+
+	<!-- selectList -->
+	<select id="selectList" resultType="Player">
+		SELECT player_id playerId, name, height, weight, birth_date birthDate, club_id clubId, profile
+		FROM players
+	</select>
+	
+	<!-- selectTotal -->
+	<select id="selectTotal" resultType="int">
+		SELECT COUNT(player_id)
+		FROM players
+	</select>
+	
+	<!-- selectPageList -->
+	<select id="selectPageList" resultType="Player" parameterType="PageVO">
+		SELECT playerId, name, height, weight, birthDate, clubId, profile
+		FROM(SELECT playerId, name, height, weight, birthDate, clubId, profile, rownum r
+			FROM(SELECT player_id playerId, name, height, weight, birth_date birthDate, club_id clubId, profile
+				FROM players
+				ORDER BY name))
+		WHERE r BETWEEN #{start} AND #{end}
+	</select>
+	
+	<!-- selectClubPlayers -->
+	<select id="selectClubPlayers" parameterType="int" resultType="Player">
+		SELECT player_id playerId, name, height, weight, birth_date birthDate, club_id clubId, profile
+		FROM players
+		WHERE club_id = #{clubId}
+	</select>
+	
+	<!-- selectOne -->
+	<select id="selectOne" resultType="Player" parameterType="int">
+		SELECT p.player_id playerId, p.name name, p.height height, p.weight weight, 
+               p.birth_date birthDate, p.profile profile, c.club_id clubId, c.name clubName
+		FROM players p, clubs c
+		WHERE p.club_id = c.club_id
+		AND p.player_id = #{playerId}
+	</select>
+	
+	<!-- selectPageNo -->
+	<select id="selectPageNo" parameterType="int" resultType="int">
+		SELECT CEIL(r/6)
+		FROM(SELECT playerId, rownum r
+			 FROM(SELECT player_id playerId
+				  FROM players
+			 	  ORDER BY name))
+		WHERE playerId = #{playerId}
+	</select>
+	
+	<!-- insert -->
+	<insert id="insert" parameterType="Player">
+		<selectKey order="BEFORE" resultType="int" keyProperty="playerId">
+			SELECT players_seq.nextval
+			FROM dual
+		</selectKey>
+		INSERT INTO players(player_id, name, height, weight, birth_date, club_id, profile)
+		VALUES(#{playerId}, #{name}, #{height}, #{weight}, #{birthDate}, #{clubId}, 'default.png')
+	</insert>
+	
+	<!-- delete -->
+	<delete id="delete" parameterType="int">
+		DELETE players
+		WHERE player_id = #{playerId}
+	</delete>
+	
+	<!-- deleteByClubId -->
+	<delete id="deleteByClubId" parameterType="int">
+		DELETE players
+		WHERE club_id = #{clubId}
+	</delete>
+	
+	<!-- update
+		error: java.lang.String cannot be cast to java.lang.Integer
+			   파라미터 타입을 int로 선언해서 발생한 문제
+		       Player를 객체로 가지고 있는 파라미터형으로 선언해야 함 -->
+	<update id="update" parameterType="Player">
+		UPDATE players
+		SET name = #{name}, height = #{height}, weight = #{weight}, birth_date = #{birthDate}, club_id = #{clubId}
+		WHERE player_id = #{playerId}
+	</update>
+
+</mapper>
+
+
+
+
